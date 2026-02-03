@@ -15,7 +15,7 @@ export type TierLevel = 1 | 2 | 3 | 4 | 5 | 6;
 /** 티어 레벨 배열 (1~6). 반복·검증용 */
 export const TIER_LEVELS: TierLevel[] = [1, 2, 3, 4, 5, 6];
 
-/** 티어 번호 → 표시 이름 */
+/** 티어 번호 → 표시 이름 (영문) */
 export const TIER_NAMES: Record<TierLevel, string> = {
   1: "Silver",
   2: "Gold",
@@ -23,6 +23,16 @@ export const TIER_NAMES: Record<TierLevel, string> = {
   4: "Diamond",
   5: "Master",
   6: "Grandmaster",
+};
+
+/** 티어 번호 → 한글 표기 (디자인 03_gym_create 기준) */
+export const TIER_NAMES_KO: Record<TierLevel, string> = {
+  1: "실버",
+  2: "골드",
+  3: "플래티넘",
+  4: "다이아몬드",
+  5: "마스터",
+  6: "그랜드마스터",
 };
 
 /** 티어별 기본 색상 (HEX). UI 뱃지·차트용 fallback */

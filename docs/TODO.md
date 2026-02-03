@@ -156,6 +156,7 @@
 
 > **DB 테이블**: gyms, gym_grade_scales
 > **라이브러리**: dnd-kit (드래그 앤 드롭)
+> **구현 계획**: [2.3-on-02-create-gym.md](implementation-plans/2.3-on-02-create-gym.md)
 
 - [ ] `app/onboarding/gym-create/page.tsx` 생성
   - [ ] 암장 이름 입력

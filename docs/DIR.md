@@ -1,8 +1,8 @@
 .
 ├── docs
-│   ├── 구현계획          # 구현계획서 정리 (규칙: 새 계획은 여기 추가)
+│   ├── implementation-plans   # 구현계획서 정리 (규칙: 새 계획은 여기 추가)
 │   │   ├── README.md
-│   │   └── 1.4-공통-유틸리티.md
+│   │   └── 1.4-common-utils.md
 │   ├── design-refs
 │   ├── troubleshooting
 │   ├── PRD.md

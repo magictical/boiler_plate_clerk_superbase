@@ -6,7 +6,7 @@
  * - 프롬프트 템플릿 (티어, 체중, 최근 훈련 요약)
  * - 응답 JSON을 zod로 검증 후 RoutineBlock[] 반환
  *
- * @see docs/구현계획/1.4-공통-유틸리티.md, docs/TODO.md 4.2 RB-02
+ * @see docs/implementation-plans/1.4-common-utils.md, docs/TODO.md 4.2 RB-02
  */
 
 import { z } from "zod";

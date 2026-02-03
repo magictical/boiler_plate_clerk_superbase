@@ -6,7 +6,7 @@
  * - 티어별 기본 색상 코드 (UI 뱃지·차트용 fallback)
  * - 실제 암장별 색상은 gym_grade_scales 사용
  *
- * @see docs/TODO.md 160~167행, docs/구현계획/1.4-공통-유틸리티.md
+ * @see docs/TODO.md 160~167행, docs/implementation-plans/1.4-common-utils.md
  */
 
 /** profiles.current_tier 제약 (1~6) */

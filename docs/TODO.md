@@ -85,7 +85,7 @@
 
 ### 1.4 공통 유틸리티
 
-> **구현계획**: [docs/구현계획/1.4-공통-유틸리티.md](구현계획/1.4-공통-유틸리티.md)
+> **구현계획**: [docs/implementation-plans/1.4-common-utils.md](implementation-plans/1.4-common-utils.md)
 
 - [x] `lib/utils/tier.ts` - 티어 관련 유틸리티
   - [x] 티어 번호 ↔ 이름 변환 (1=Silver, 2=Gold, ...)
@@ -108,7 +108,7 @@
 | routine.ts | TUT/총 소요시간/총 세트 수 (getRoutineTotalDurationSeconds, getRoutineTotalSets, getRoutineTUTSeconds) | types/database RoutineBlock |
 | gemini.ts  | 루틴 생성 API (buildRoutinePrompt, generateRoutineContent, parseRoutineResponse)                       | GEMINI_API_KEY, zod         |
 
-구현 순서: tier → routine → gemini. 상세: [구현계획/1.4-공통-유틸리티.md](구현계획/1.4-공통-유틸리티.md)
+구현 순서: tier → routine → gemini. 상세: [implementation-plans/1.4-common-utils.md](implementation-plans/1.4-common-utils.md)
 
 </details>
 

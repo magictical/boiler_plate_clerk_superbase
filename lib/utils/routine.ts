@@ -6,7 +6,7 @@
  * - 총 소요시간: 모든 블록 duration 합
  * - 총 세트 수: 그룹/루프 반복 반영
  *
- * @see types/database.ts RoutineBlock, docs/구현계획/1.4-공통-유틸리티.md
+ * @see types/database.ts RoutineBlock, docs/implementation-plans/1.4-common-utils.md
  */
 
 import type { RoutineBlock } from "@/types/database";

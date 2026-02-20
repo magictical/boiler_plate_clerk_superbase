@@ -233,41 +233,43 @@
 ### 3.1 HM-01: Guest 홈 화면 `MVP`
 
 > **PRD 참조**: 3.4 [Guest Mode View]
+> **구현 계획**: [3.1-hm-01-guest-home.md](implementation-plans/3.1-hm-01-guest-home.md)
 
-- [ ] `app/(main)/page.tsx` Guest 분기
-  - [ ] 상단 Sticky 배너: "내 티어 확인하고 AI 코칭 받기"
-  - [ ] 티어 영역: ? 뱃지 또는 잠금 아이콘
-  - [ ] 차트 영역: Sample Data + "데이터가 필요합니다"
-  - [ ] [+ 새 루틴] 클릭 시 설정 유도 팝업
-- [ ] `components/home/GuestBanner.tsx`
-  - [ ] 온보딩 유도 배너
-  - [ ] 클릭 시 온보딩 Step 1 이동
-- [ ] `components/common/GatePopup.tsx`
-  - [ ] "프로필을 완성해주세요" 팝업
-  - [ ] [확인] → 온보딩 / [취소] → 닫기
+- [x] `app/page.tsx` Guest 분기
+  - [x] 상단 Sticky 배너: "내 티어 확인하고 AI 코칭 받기"
+  - [x] 티어 영역: ? 뱃지 또는 잠금 아이콘
+  - [x] 차트 영역: Sample Data + "데이터가 필요합니다"
+  - [x] [+ 새 루틴] 클릭 시 설정 유도 팝업
+- [x] `components/home/GuestBanner.tsx`
+  - [x] 온보딩 유도 배너
+  - [x] 클릭 시 온보딩 Step 1 이동
+- [x] `components/common/GatePopup.tsx`
+  - [x] "프로필을 완성해주세요" 팝업
+  - [x] [확인] → 온보딩 / [취소] → 닫기
 
 ### 3.2 HM-02: Regular User 홈 화면 `MVP`
 
 > **PRD 참조**: 3.4 [Regular User View]
 > **DB 테이블**: profiles, training_logs
+> **구현 계획**: [3.2-hm-02-regular-home.md](implementation-plans/3.2-hm-02-regular-home.md)
 
-- [ ] `app/(main)/page.tsx` Regular 분기
-  - [ ] 히어로 섹션: 닉네임 + 티어 뱃지
-  - [ ] 스트릭 위젯: 불꽃 + 연속 일수
-  - [ ] 성과 차트 (필터: 1개월/3개월/전체)
-  - [ ] FAB: [+ 새 루틴 만들기]
-- [ ] `components/home/HeroSection.tsx`
-  - [ ] 프로필 정보 표시
-  - [ ] TierBadge 통합
-- [ ] `components/home/StreakWidget.tsx`
-  - [ ] current_streak 표시
-  - [ ] 불꽃 아이콘 애니메이션
-- [ ] `components/home/StatsChart.tsx`
-  - [ ] 기간 필터 (1M/3M/All)
-  - [ ] 선 그래프 (Daily Max) / 막대 그래프 (볼륨)
-  - [ ] recharts 또는 chart.js 사용
-- [ ] `actions/training-logs.ts`
-  - [ ] `getTrainingStats(userId, period)` - 통계 조회
+- [x] `app/page.tsx` Regular 분기
+  - [x] 히어로 섹션: 닉네임 + 티어 뱃지
+  - [x] 스트릭 위젯: 불꽃 + 연속 일수
+  - [x] 성과 차트 (필터: 1개월/3개월/전체)
+  - [x] FAB: [+ 새 루틴 만들기]
+- [x] `components/home/HeroSection.tsx`
+  - [x] 프로필 정보 표시
+  - [x] TierBadge 통합
+- [x] `components/home/StreakWidget.tsx`
+  - [x] current_streak 표시
+  - [x] 불꽃 아이콘
+- [x] `components/home/StatsChart.tsx`
+  - [x] 기간 필터 (1M/3M/All)
+  - [x] Recharts AreaChart
+- [x] `actions/training-logs.ts`
+  - [x] `getHomeMetrics()` - 홈 요약 메트릭
+  - [x] `getTrainingStats(period)` - 통계 조회 (MVP는 빈 데이터)
 
 ---
 
@@ -279,34 +281,36 @@
 ### 4.1 RB-01: 빌더 모드 선택 `MVP`
 
 > **PRD 참조**: 3.2 루틴 빌더 Gate Logic
+> **구현 계획**: [4.1-rb-01-mode-select.md](implementation-plans/4.1-rb-01-mode-select.md)
 
-- [ ] `app/routine-builder/page.tsx` 생성
-  - [ ] Guest 체크 → GatePopup 출력
-  - [ ] 카드 A: AI 코치 (Gemini 아이콘)
-  - [ ] 카드 B: 커스텀 빌더 (설정 아이콘)
-- [ ] `components/routine-builder/ModeSelectCard.tsx`
-  - [ ] 모드 선택 카드 UI
+- [x] `app/routine-builder/page.tsx` 생성
+  - [x] Guest 체크 → GatePopup 출력
+  - [x] 카드 A: AI 코치 (Gemini 아이콘)
+  - [x] 카드 B: 커스텀 빌더 (설정 아이콘)
+- [x] `components/routine-builder/ModeSelectCard.tsx`
+  - [x] 모드 선택 카드 UI
 
 ### 4.2 RB-02: AI 코치 (AI Coach) `MVP`
 
 > **PRD 참조**: 3.2 A. AI Coach
 > **Context 주입**: 티어, 체중, 지난 훈련 로그
+> **구현 계획**: [4.2-rb-02-ai-coach.md](implementation-plans/4.2-rb-02-ai-coach.md)
 
-- [ ] `app/routine-builder/ai-coach/page.tsx` 생성
-  - [ ] 채팅 인터페이스
-  - [ ] 퀵 리플라이 칩: [컨디션 좋음], [어깨 통증], [시간 부족]
-  - [ ] 루틴 제안 카드
-  - [ ] [빌더로 가져오기] 버튼
-- [ ] `components/routine-builder/AIChat.tsx`
-  - [ ] 채팅 메시지 렌더링
-  - [ ] 스크롤 처리
-  - [ ] 로딩 상태
-- [ ] `components/routine-builder/RoutineSuggestionCard.tsx`
-  - [ ] 예상 시간, 강도 표시
-  - [ ] JSON 데이터 프리뷰
-- [ ] `actions/ai.ts` Server Actions
-  - [ ] `generateRoutine(context)` - Gemini API 호출
-  - [ ] Strict JSON Schema 검증
+- [x] `app/routine-builder/ai-coach/page.tsx` 생성
+  - [x] 채팅 인터페이스
+  - [x] 퀵 리플라이 칩: [컨디션 좋음], [어깨 통증], [시간 부족]
+  - [x] 루틴 제안 카드
+  - [x] [빌더로 가져오기] 버튼
+- [x] `components/routine-builder/AIChat.tsx`
+  - [x] 채팅 메시지 렌더링
+  - [x] 스크롤 처리
+  - [x] 로딩 상태
+- [x] `components/routine-builder/RoutineSuggestionCard.tsx`
+  - [x] 예상 시간, 강도 표시
+  - [x] JSON 데이터 프리뷰
+- [x] `actions/ai.ts` Server Actions
+  - [x] `generateRoutine(context)` - Gemini API 호출
+  - [x] Strict JSON Schema 검증
 
 ### 4.3 RB-03: 루틴 에디터 (Block Editor) `MVP`
 

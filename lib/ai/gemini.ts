@@ -13,7 +13,7 @@ import { z } from "zod";
 import type { RoutineBlock } from "@/types/database";
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_MODEL = "gemini-2.0-flash";
+const DEFAULT_MODEL = "gemini-2.5-flash";
 
 /** 루틴 생성 컨텍스트 */
 export interface RoutinePromptContext {

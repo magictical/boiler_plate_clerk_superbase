@@ -18,4 +18,8 @@
 | [2.2-on-01-gym-select.md](./2.2-on-01-gym-select.md)         | 2.2 ON-01 홈짐 선택 (Gym Selection) MVP   | 완료      |
 | [2.3-on-02-create-gym.md](./2.3-on-02-create-gym.md)         | 2.3 ON-02 커스텀 암장 등록 (Create Gym)   | 완료      |
 | [2.4-on-03-tier-assign.md](./2.4-on-03-tier-assign.md)       | 2.4 ON-03 티어 배정 (Tier Assignment) MVP | 완료      |
-| [2.5-on-04-assessment.md](./2.5-on-04-assessment.md)         | 2.5 ON-04 수행 능력 측정 (Assessment) MVP | 계획 수립 |
+| [2.5-on-04-assessment.md](./2.5-on-04-assessment.md)         | 2.5 ON-04 수행 능력 측정 (Assessment) MVP | 완료      |
+| [3.1-hm-01-guest-home.md](./3.1-hm-01-guest-home.md)       | 3.1 HM-01 Guest 홈 화면 MVP               | 완료      |
+| [3.2-hm-02-regular-home.md](./3.2-hm-02-regular-home.md)   | 3.2 HM-02 Regular User 홈 화면 MVP       | 완료      |
+| [4.1-rb-01-mode-select.md](./4.1-rb-01-mode-select.md)     | 4.1 RB-01 빌더 모드 선택 (Mode Select) MVP | 완료      |
+| [4.2-rb-02-ai-coach.md](./4.2-rb-02-ai-coach.md)           | 4.2 RB-02 AI 코치 (AI Coach) MVP          | 완료      |

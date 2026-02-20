@@ -93,6 +93,66 @@ export async function setCurrentTier(tier: TierLevel): Promise<{ error: string |
 }
 
 /**
+ * 홈 화면용: 현재 사용자의 home_gym_id, current_tier를 한 번에 조회합니다.
+ * Guest 판별: isGuest = home_gym_id === null || current_tier === null
+ */
+export async function getProfileForHome(): Promise<{
+  home_gym_id: string | null;
+  current_tier: number | null;
+  isGuest: boolean;
+  error: string | null;
+}> {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return {
+        home_gym_id: null,
+        current_tier: null,
+        isGuest: true,
+        error: null,
+      };
+    }
+
+    const supabase = getServiceRoleClient();
+    const { data, error } = await supabase
+      .from("users")
+      .select("home_gym_id, current_tier")
+      .eq("clerk_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      return {
+        home_gym_id: null,
+        current_tier: null,
+        isGuest: true,
+        error: error.message,
+      };
+    }
+
+    const home_gym_id = data?.home_gym_id ?? null;
+    const rawTier = data?.current_tier ?? null;
+    const current_tier =
+      rawTier != null && rawTier >= 1 && rawTier <= 6 ? rawTier : null;
+    const isGuest = home_gym_id === null || current_tier === null;
+
+    return {
+      home_gym_id,
+      current_tier,
+      isGuest,
+      error: null,
+    };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "getProfileForHome failed";
+    return {
+      home_gym_id: null,
+      current_tier: null,
+      isGuest: true,
+      error: message,
+    };
+  }
+}
+
+/**
  * 현재 로그인 사용자의 티어를 반환합니다.
  * assessment 페이지 진입 시 티어 배정 완료 여부 확인용.
  */

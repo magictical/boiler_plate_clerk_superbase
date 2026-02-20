@@ -2,15 +2,40 @@
 
 import { BlockListRoot } from "@/components/routine-builder/editor/BlockList";
 import { EditorFooter } from "@/components/routine-builder/editor/EditorFooter";
-import { RoutineEditorProvider } from "@/components/routine-builder/editor/RoutineEditorContext";
+import { RoutineEditorProvider, useRoutineEditor } from "@/components/routine-builder/editor/RoutineEditorContext";
+import type { RoutineBlock } from "@/types/routine";
 import { ArrowLeft, Layers, Save, Upload } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 function EditorContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { dispatch } = useRoutineEditor();
   const [boardType, setBoardType] = useState<"hangboard" | "lift">("hangboard");
   const [routineName, setRoutineName] = useState("나의 루틴");
+
+  // AI 코치에서 넘어온 에디터: localStorage에서 블록 로드
+  useEffect(() => {
+    if (searchParams.get("from") === "ai") {
+      try {
+        const raw = localStorage.getItem("importedRoutine");
+        const titleRaw = localStorage.getItem("importedRoutineTitle");
+        if (raw) {
+          const parsed: RoutineBlock[] = JSON.parse(raw);
+          dispatch({ type: "SET_BLOCKS", payload: { blocks: parsed } });
+          if (titleRaw) setRoutineName(titleRaw);
+          toast.success("AI 에서 생성한 루틴을 불러오는 데 성공했습니다.");
+        }
+        // 1회만 로드 (cleanup)
+        localStorage.removeItem("importedRoutine");
+        localStorage.removeItem("importedRoutineTitle");
+      } catch (e) {
+        console.error("Failed to import AI routine:", e);
+      }
+    }
+  }, [searchParams, dispatch]);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0d1414] text-white font-sans antialiased pb-[400px]">

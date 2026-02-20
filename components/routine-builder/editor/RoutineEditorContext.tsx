@@ -1,9 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useReducer, ReactNode } from "react";
-import type { RoutineBlock, RoutineStats, LoopBlock } from "@/types/routine";
 import { calculateRoutineStats } from "@/lib/utils/routine-calc";
+import type { LoopBlock, RoutineBlock, RoutineStats } from "@/types/routine";
 import { arrayMove } from "@dnd-kit/sortable";
+import React, { createContext, ReactNode, useContext, useReducer } from "react";
 
 interface RoutineEditorState {
   blocks: RoutineBlock[];

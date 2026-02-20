@@ -1,9 +1,9 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
-import { getServiceRoleClient } from "@/lib/supabase/service-role";
 import { LOGIN_REQUIRED_MESSAGE } from "@/constants/auth";
+import { getServiceRoleClient } from "@/lib/supabase/service-role";
 import type { TierLevel } from "@/lib/utils/tier";
+import { auth } from "@clerk/nextjs/server";
 
 /**
  * 현재 로그인 사용자의 홈짐을 설정합니다.
@@ -225,5 +225,41 @@ export async function updateAssessment(
   } catch (e) {
     const message = e instanceof Error ? e.message : "updateAssessment failed";
     return { error: message };
+  }
+}
+
+/**
+ * 설정 페이지용: 사용자의 전체 프로필 데이터를 조회합니다.
+ */
+export async function getProfileForSettings() {
+  try {
+    const { userId } = await auth();
+    if (!userId) {
+      return { data: null, error: LOGIN_REQUIRED_MESSAGE };
+    }
+
+    const supabase = getServiceRoleClient();
+    const { data: userRow, error } = await supabase
+      .from("users")
+      .select(`
+        name,
+        current_tier,
+        max_hang_1rm,
+        weight_kg,
+        home_gym_id,
+        gyms ( name )
+      `)
+      .eq("clerk_id", userId)
+      .maybeSingle();
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    // Clerk의 정보도 가져올 수 있으나, 일단 DB user 정보 위주로 구성
+    return { data: userRow, error: null };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "getProfileForSettings failed";
+    return { data: null, error: message };
   }
 }

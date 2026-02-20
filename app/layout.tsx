@@ -3,7 +3,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
-import Navbar from "@/components/Navbar";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -88,7 +87,6 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SyncUserProvider>
-              <Navbar />
               {children}
               <Toaster />
             </SyncUserProvider>

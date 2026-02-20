@@ -459,18 +459,29 @@
 > **PRD 참조**: 3.3 C. 세션 관리
 > **DB 필드**: training_logs.status, rpe, abort_reason
 
-- [ ] `app/workout/[routineId]/end/page.tsx` 생성
-  - [ ] 정상 완료 시: RPE 슬라이더 (1~10)
-  - [ ] 중단 시: 사유 선택 (부상, 컨디션 난조 등)
-  - [ ] [기록 저장하기] 버튼
-- [ ] `components/workout/SessionEnd.tsx`
-  - [ ] RPE 슬라이더
-  - [ ] 피드백 텍스트 동적 변경
-- [ ] `components/workout/AbortReasonPicker.tsx`
-  - [ ] 중단 사유 선택 UI
-- [ ] `actions/training-logs.ts`
-  - [ ] `createTrainingLog(data)` - 훈련 기록 저장
-  - [ ] `updateStreak(userId)` - 스트릭 업데이트
+- [x] `app/workout/[routineId]/end/page.tsx` 생성
+  - [x] 정상 완료 시: RPE 슬라이더 (1~10)
+  - [x] 중단 시: 사유 선택 (부상, 컨디션 난조 등)
+  - [x] [기록 저장하기] 버튼
+- [x] `components/workout/SessionEndClient.tsx`
+  - [x] RPE 슬라이더 / 중단 사유 선택 포함
+  - [x] 피드백 텍스트 동적 변경
+- [x] `actions/training-logs.ts`
+  - [x] `createTrainingLog(data)` - 훈련 기록 저장
+  - [x] `updateStreak(userId)` - 스트릭 업데이트
+
+### 5.5 PL-05: 홈 화면 데이터 프로바이딩 (Home Stats Data Integration) `MVP`
+
+> **원인 분석**: 현재 `actions/training-logs.ts`의 `getHomeMetrics()` 및 `getTrainingStats()` 함수가 UI 개발 속도를 높이기 위해 다음과 같이 **정적인 데이터 (또는 0, 빈 배열)** 를 반환하도록 하드코딩 되어 있습니다. 훈련 기록(로깅) 체계를 갖추었으므로 실제 저장된 `training_logs` 를 집계하여 홈 화면에 시각화 해야 합니다.
+
+- [x] `actions/training-logs.ts` 보완 개발
+  - [x] `getHomeMetrics` 리팩터링: 사용자가 최근 1주~1달 간 수행한 `session` 수 카운트, `totalReps` 집계 알고리즘 적용
+  - [x] `getTrainingStats` 리팩터링: 실제 `training_logs` 의 `ended_at` 날짜 기반으로 데이터 그룹화하여 해당 기간(1M, 3M, ALL)의 `TrainingStatsPoint[]` 리스트 (볼륨/성공률 등) 반환
+  - [x] `consistencyPercent` 계산: 설정한 주간 훈련 목표 대비 달성률 표시 (MVP 시 단순 계산)
+- [x] `components/home/StatsChart.tsx` 동적 연동
+  - [x] 클라이언트 혹은 서버 사이드에서 서버 액션(`getTrainingStats`)을 호출하여 동적으로 Recharts 차트를 렌더링하도록 통합
+- [x] `app/page.tsx`
+  - [x] 초기 데이터 로딩 시 실제 `getHomeMetrics` 에서 받은 지표(루틴 완료 수, 연속 일수 등)를 `MetricGrid` 와 `StreakWidget` 에 전달
 
 ---
 
@@ -482,20 +493,20 @@
 
 > **PRD 참조**: 3.5 설정
 
-- [ ] `app/settings/page.tsx` 생성
-  - [ ] 프로필 카드 (티어 뱃지, 소속 암장)
-  - [ ] Guest: 프로필 완성 진행바
-  - [ ] 앱 설정: 사운드, 다크모드
-  - [ ] 계정 관리: 로그아웃, 탈퇴
-- [ ] `components/settings/ProfileCard.tsx`
-  - [ ] 프로필 정보 표시
-  - [ ] [변경] 버튼 → 온보딩
-- [ ] `components/settings/AppSettings.tsx`
-  - [ ] 사운드 토글
-  - [ ] 다크모드 토글 (localStorage)
-- [ ] `components/settings/AccountSettings.tsx`
-  - [ ] Clerk 로그아웃
-  - [ ] 회원 탈퇴 (확인 모달)
+- [x] `app/settings/page.tsx` 생성
+  - [x] 프로필 카드 (티어 뱃지, 소속 암장)
+  - [x] Guest: 프로필 완성 진행바
+  - [x] 앱 설정: 사운드, 다크모드
+  - [x] 계정 관리: 로그아웃, 탈퇴
+- [x] `components/settings/ProfileCard.tsx`
+  - [x] 프로필 정보 표시
+  - [x] [변경] 버튼 → 온보딩
+- [x] `components/settings/AppSettings.tsx`
+  - [x] 사운드 토글
+  - [x] 다크모드 토글 (localStorage)
+- [x] `components/settings/AccountSettings.tsx`
+  - [x] Clerk 로그아웃
+  - [x] 회원 탈퇴 (확인 모달)
 
 ---
 

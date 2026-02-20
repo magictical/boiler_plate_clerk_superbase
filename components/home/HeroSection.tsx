@@ -8,7 +8,8 @@
 
 import { TierBadge } from "@/components/common/TierBadge";
 import type { TierLevel } from "@/lib/utils/tier";
-import { User } from "lucide-react";
+import { Settings, User } from "lucide-react";
+import Link from "next/link";
 
 export type HeroSectionProps = {
   displayName: string;
@@ -41,11 +42,16 @@ export function HeroSection({
           {displayName}
         </h2>
       </div>
-      {tier != null && (
-        <div className="flex items-center gap-2 px-3 py-1 rounded border border-[#1fe7f9]/20 bg-[#1fe7f9]/5 shadow-[0_0_8px_rgba(31,231,249,0.1)]">
-          <TierBadge tier={tier as TierLevel} animate={false} className="!px-2 !py-0.5 !text-xs" />
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        {tier != null && (
+          <div className="flex items-center gap-2 px-3 py-1 rounded border border-[#1fe7f9]/20 bg-[#1fe7f9]/5 shadow-[0_0_8px_rgba(31,231,249,0.1)]">
+            <TierBadge tier={tier as TierLevel} animate={false} className="!px-2 !py-0.5 !text-xs" />
+          </div>
+        )}
+        <Link href="/settings" className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors">
+          <Settings size={22} />
+        </Link>
+      </div>
     </header>
   );
 }

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { WorkoutSegment } from "@/lib/utils/flattenRoutine";
 import { AlertTriangle, CheckCircle2, X, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface LoggerPlayerProps {
@@ -23,20 +23,26 @@ export function LoggerPlayer({ segments, routineId }: LoggerPlayerProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [results, setResults] = useState<Record<string, LoggerStatus>>({});
   const [showAbortModal, setShowAbortModal] = useState(false);
+  const startedAtRef = useRef<string>(new Date().toISOString());
 
   const isFinished = currentIndex >= exerciseSegments.length;
 
+  useEffect(() => {
+    if (isFinished) {
+      toast.success("훈련을 모두 완료하셨습니다! 로그가 저장됩니다.");
+      const resultsJsonStr = JSON.stringify(results);
+      router.replace(
+        `/workout/${routineId}/end?status=completed&start=${encodeURIComponent(startedAtRef.current)}&results=${encodeURIComponent(resultsJsonStr)}`
+      );
+    }
+  }, [isFinished, router, routineId, results]);
+
   if (isFinished) {
-    // 세션 종료 UI: MVP용. 추후 /workout/[routineId]/end 에서 RPE 처리.
-    toast.success("훈련을 모두 완료하셨습니다! 로그가 저장됩니다.");
-    setTimeout(() => {
-      router.push("/");
-    }, 2000);
     return (
       <div className="flex h-[80vh] flex-col items-center justify-center text-center">
         <div className="animate-bounce mb-4 text-6xl">📝</div>
-        <h2 className="text-2xl font-bold text-white mb-2">훈련 로깅 완료!</h2>
-        <p className="text-gray-400">모든 세트를 기록하셨습니다.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">기록 저장 중...</h2>
+        <p className="text-gray-400">결과 화면으로 이동합니다.</p>
       </div>
     );
   }
@@ -54,7 +60,11 @@ export function LoggerPlayer({ segments, routineId }: LoggerPlayerProps) {
   };
 
   const handleAbort = () => {
-    router.back();
+    setShowAbortModal(false);
+    const resultsJsonStr = JSON.stringify(results);
+    router.replace(
+      `/workout/${routineId}/end?status=aborted&start=${encodeURIComponent(startedAtRef.current)}&results=${encodeURIComponent(resultsJsonStr)}`
+    );
   };
 
   return (

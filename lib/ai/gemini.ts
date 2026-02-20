@@ -9,8 +9,8 @@
  * @see docs/implementation-plans/1.4-common-utils.md, docs/TODO.md 4.2 RB-02
  */
 
-import { z } from "zod";
 import type { RoutineBlock } from "@/types/database";
+import { z } from "zod";
 
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta";
 const DEFAULT_MODEL = "gemini-2.5-flash";
@@ -40,37 +40,78 @@ function getApiKey(): string {
  */
 export function buildRoutinePrompt(context: RoutinePromptContext): string {
   const { tier, weightKg, recentSummary } = context;
+
   const parts: string[] = [
-    "You are a climbing training coach. Generate a single routine as a JSON array of blocks.",
-    "Each block must have: type (string), and optionally: durationSeconds (number), repeatCount (number), children (nested blocks).",
-    "Use block types like: 'exercise', 'rest', 'set', 'warmup', 'cooldown'.",
+    `You are an expert rock climbing and hangboard training coach. Your task is to generate a JSON routine for a climbing athlete.
+
+The routine must be a JSON array of 'blocks'. Each block must follow this EXACT schema:
+
+1. Exercise Block (for actual exercises - hangboard hangs, pull-ups, no-hang lifts, etc.):
+   {
+     "id": "<unique string like ex_1>",
+     "type": "exercise",
+     "title": "<exercise name in Korean, e.g. 풀업, 10초 max hang, 노행 리프트>",
+     "duration": <duration in SECONDS as a number>,
+     "reps": <number of reps, ONLY if it is a rep-based exercise, otherwise omit>,
+     "color": "<a hex color like #f44336 or #e91e63>"
+   }
+
+2. Rest Block (for rest periods only):
+   {
+     "id": "<unique string like rest_1>",
+     "type": "rest",
+     "duration": <duration in SECONDS as a number>
+   }
+
+3. Loop Block (for repeating circuits or sets):
+   {
+     "id": "<unique string like loop_1>",
+     "type": "loop",
+     "repeat": <number of times to repeat>,
+     "children": [<array of exercise and rest blocks>]
+   }
+
+IMPORTANT RULES:
+- ONLY use type values: "exercise", "rest", "loop". NO OTHER TYPES.
+- Use Korean names for exercises. Examples: 풀업, 노행 리프트, 핑거 행, 10초 max hang, 3손가락 오픈핸드 hang, 오프셋 행, 사이드 레버
+- All "duration" fields must be in SECONDS (not minutes).
+- Generate realistic climbing training: warmup exercises → main sets (in a loop) → cooldown.
+- Include short rest periods between exercises.
+- Make the workout appropriate for the user tier (1=beginner, 6=elite).`,
   ];
+
   if (tier != null) {
-    parts.push(`User tier (1-6): ${tier}.`);
+    parts.push(`User tier level (1=beginner to 6=elite): ${tier}.`);
   }
   if (weightKg != null) {
-    parts.push(`User weight (kg): ${weightKg}.`);
+    parts.push(`User bodyweight: ${weightKg}kg.`);
   }
   if (recentSummary && recentSummary.trim()) {
-    parts.push(`Recent training summary: ${recentSummary.trim()}`);
+    parts.push(`Context and user request: ${recentSummary.trim()}`);
   }
+
   parts.push(
-    "Reply with ONLY a valid JSON array, no markdown or explanation. Example: [{\"type\":\"warmup\",\"durationSeconds\":300},{\"type\":\"set\",\"repeatCount\":3,\"children\":[{\"type\":\"exercise\",\"durationSeconds\":40}]}]",
+    `Reply with ONLY a valid JSON array. No markdown, no explanation. Example structure:
+[{"id":"ex_warmup","type":"exercise","title":"가벼운 스트레칭","duration":120,"color":"#4caf50"},{"id":"loop_1","type":"loop","repeat":4,"children":[{"id":"ex_1","type":"exercise","title":"10초 max hang","duration":10,"color":"#f44336"},{"id":"rest_1","type":"rest","duration":50}]},{"id":"ex_cooldown","type":"exercise","title":"쿨다운 스트레칭","duration":180,"color":"#2196f3"}]`
   );
+
   return parts.join("\n");
 }
 
-/** 재귀적 루틴 블록 스키마 (zod) */
+/** 재귀적 루틴 블록 스키마 (zod) - 실제 RoutineBlock 타입에 맞게 업데이트 */
 const routineBlockSchema = z.lazy(() =>
   z
     .object({
-      type: z.string(),
-      children: z.array(routineBlockSchema).optional(),
-      durationSeconds: z.number().optional(),
-      duration_seconds: z.number().optional(),
-      repeatCount: z.number().optional(),
-      repeat_count: z.number().optional(),
+      id: z.string().optional(),
+      type: z.enum(["exercise", "rest", "loop"]),
+      title: z.string().optional(),
+      duration: z.number().optional(),
+      durationSeconds: z.number().optional(), // backward compat
       reps: z.number().optional(),
+      repeat: z.number().optional(),
+      repeatCount: z.number().optional(), // backward compat
+      color: z.string().optional(),
+      children: z.array(routineBlockSchema).optional(),
     })
     .passthrough(),
 ) as z.ZodType<RoutineBlock>;
@@ -79,6 +120,7 @@ const routineResponseSchema = z.array(routineBlockSchema);
 
 /**
  * Gemini 응답 텍스트에서 JSON 배열 파싱 후 검증
+ * 또한 AI가 id를 누락할 경우 자동으로 생성해줌
  */
 export function parseRoutineResponse(text: string): RoutineBlock[] {
   let raw = text.trim();
@@ -100,7 +142,29 @@ export function parseRoutineResponse(text: string): RoutineBlock[] {
       "Gemini routine JSON failed validation: " + result.error.message,
     );
   }
-  return result.data;
+
+  // 자동으로 id 생성, durationSeconds -> duration 변환
+  let counter = 0;
+  function normalizeBlock(block: RoutineBlock): RoutineBlock {
+    const id = (block as { id?: string }).id || `block_${++counter}_${Date.now()}`;
+    const baseBlock = { ...block, id } as { id: string; type: string; duration?: number; durationSeconds?: number; repeatCount?: number; repeat?: number; children?: RoutineBlock[] };
+
+    // durationSeconds -> duration (호환성)
+    if (!baseBlock.duration && baseBlock.durationSeconds) {
+      baseBlock.duration = baseBlock.durationSeconds;
+    }
+    // repeatCount -> repeat (호환성)
+    if (!baseBlock.repeat && baseBlock.repeatCount) {
+      baseBlock.repeat = baseBlock.repeatCount;
+    }
+    // loop 자식복 정규화
+    if (baseBlock.type === "loop" && baseBlock.children) {
+      return { ...baseBlock, children: baseBlock.children.map(normalizeBlock) } as RoutineBlock;
+    }
+    return baseBlock as RoutineBlock;
+  }
+
+  return result.data.map(normalizeBlock);
 }
 
 /**

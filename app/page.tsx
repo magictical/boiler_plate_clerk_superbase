@@ -5,7 +5,7 @@
  */
 
 import { getProfileForHome } from "@/actions/profiles";
-import { getHomeMetrics } from "@/actions/training-logs";
+import { getHomeMetrics, getTrainingStats } from "@/actions/training-logs";
 import { GuestBanner } from "@/components/home/GuestBanner";
 import { GuestChartSection } from "@/components/home/GuestChartSection";
 import { GuestRoutineButton } from "@/components/home/GuestRoutineButton";
@@ -17,6 +17,8 @@ import { RoutineFAB } from "@/components/home/RoutineFAB";
 import { StatsChart } from "@/components/home/StatsChart";
 import { StreakWidget } from "@/components/home/StreakWidget";
 import type { TierLevel } from "@/lib/utils/tier";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 export default async function Home() {
   const { isGuest, error } = await getProfileForHome();
@@ -35,6 +37,12 @@ export default async function Home() {
     return (
       <main className="min-h-screen max-w-[430px] w-full mx-auto bg-[#0f2123] text-white pb-8 pt-0 px-0">
         <div className="relative w-full min-h-screen flex flex-col overflow-x-hidden">
+          <header className="flex items-center justify-between px-5 pt-4 pb-4">
+            <h1 className="text-xl font-black tracking-widest italic text-[#1fe7f9]">GRIPLAB</h1>
+            <Link href="/settings" className="p-2 -mr-2 text-gray-400 hover:text-white transition-colors">
+              <Settings size={22} />
+            </Link>
+          </header>
           <GuestBanner />
           <GuestTierSection />
           <GuestChartSection />
@@ -46,12 +54,17 @@ export default async function Home() {
   }
 
   const { data: metrics, error: metricsError } = await getHomeMetrics();
+  const { data: initialChartData } = await getTrainingStats("1M");
+
   if (metricsError || !metrics) {
     return (
       <main className="min-h-screen bg-[#0f2123] text-white">
         <div className="max-w-[430px] mx-auto px-4 py-8">
-          <p className="text-red-400">
+          <p className="text-red-400 font-bold">
             메트릭을 불러오는 중 오류가 발생했습니다.
+          </p>
+          <p className="text-sm text-red-300 mt-2 bg-red-500/10 p-4 rounded-xl break-words">
+            {metricsError || "데이터를 찾을 수 없습니다."}
           </p>
         </div>
       </main>
@@ -72,7 +85,7 @@ export default async function Home() {
             bestStreak={undefined}
           />
           <HomeRoutineActions />
-          <StatsChart initialData={[]} initialPeriod="1M" />
+          <StatsChart initialData={initialChartData || []} initialPeriod="1M" />
           <MetricGrid metrics={metrics} />
         </div>
         <RoutineFAB />

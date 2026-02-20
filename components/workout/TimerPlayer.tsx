@@ -5,7 +5,7 @@ import { WorkoutSegment } from "@/lib/utils/flattenRoutine";
 import { formatDuration } from "@/lib/utils/routine-calc";
 import { Pause, Play, SkipForward, XCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 interface TimerPlayerProps {
@@ -29,19 +29,24 @@ export function TimerPlayer({ segments, routineId }: TimerPlayerProps) {
   } = useWorkoutTimer(segments);
 
   const [showAbortModal, setShowAbortModal] = useState(false);
+  const startedAtRef = useRef<string>(new Date().toISOString());
+
+  // 세션 종료 결과 모달로 바로 가거나 메인으로 튕기기
+  useEffect(() => {
+    if (isFinished) {
+      toast.success("훈련을 모두 완료하셨습니다! 🎉");
+      router.replace(
+        `/workout/${routineId}/end?status=completed&start=${encodeURIComponent(startedAtRef.current)}`
+      );
+    }
+  }, [isFinished, router, routineId]);
 
   if (isFinished) {
-    // 세션 종료 결과 모달로 바로 가거나 메인으로 튕기기
-    // 실제 앱에서는 /workout/[routineId]/end 로 이동하여 RPE 및 통계를 남김.
-    toast.success("훈련을 모두 완료하셨습니다! 🎉");
-    setTimeout(() => {
-      router.push("/");
-    }, 2000);
     return (
       <div className="flex h-[80vh] flex-col items-center justify-center text-center">
         <div className="animate-bounce mb-4 text-6xl">🎉</div>
-        <h2 className="text-2xl font-bold text-white mb-2">훈련 완료!</h2>
-        <p className="text-gray-400">루틴을 성공적으로 마치셨습니다.</p>
+        <h2 className="text-2xl font-bold text-white mb-2">훈련 코어 시스템 완료!</h2>
+        <p className="text-gray-400">결과 화면으로 이동합니다...</p>
       </div>
     );
   }
@@ -58,8 +63,11 @@ export function TimerPlayer({ segments, routineId }: TimerPlayerProps) {
   const nextExercise = nextSegments.find(s => s.type === "exercise");
 
   const handleAbort = () => {
-    // 중단 로직 (현재는 단순히 뒤로가기)
-    router.back();
+    // /workout/[routineId]/end 로 이동 (status=aborted)
+    setShowAbortModal(false);
+    router.replace(
+      `/workout/${routineId}/end?status=aborted&start=${encodeURIComponent(startedAtRef.current)}`
+    );
   };
 
   return (

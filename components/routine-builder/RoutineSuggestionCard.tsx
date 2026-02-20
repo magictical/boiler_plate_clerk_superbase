@@ -18,27 +18,29 @@ export function RoutineSuggestionCard({
 }: RoutineSuggestionCardProps) {
   const router = useRouter();
 
-  // 간단한 통계 계산
-  const totalDuration = blocks.reduce(
-    (acc, block) => acc + (block.durationSeconds || 0),
-    0
-  );
+  // 간단한 통계 계산 (duration 필드 사용, 하위호환으로 durationSeconds도 체크)
+  const totalDuration = blocks.reduce((acc, block) => {
+    const d = (block as { duration?: number; durationSeconds?: number }).duration
+      ?? (block as { durationSeconds?: number }).durationSeconds
+      ?? 0;
+    return acc + d;
+  }, 0);
   const minutes = Math.floor(totalDuration / 60);
 
   // 강도 추정 (임시 로직: 블록 수에 따라)
   const intensity = blocks.length > 5 ? "고강도" : "중강도";
 
   const handleImport = () => {
-    // 1. 로컬 스토리지에 저장 (MVP)
-    // 실제 빌더 페이지에서는 이 값을 읽어서 초기화해야 함
+    // localStorage에 블록과 타이틀 저장 후 에디터로 이동
     localStorage.setItem("importedRoutine", JSON.stringify(blocks));
-    
+    localStorage.setItem("importedRoutineTitle", title);
+
     toast.success("루틴을 빌더로 가져왔습니다.");
-    
+
     if (onImport) {
       onImport();
     } else {
-      router.push("/routine-builder/editor");
+      router.push("/routine-builder/editor?from=ai");
     }
   };
 

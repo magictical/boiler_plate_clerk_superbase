@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { Send, Plus, Sparkles } from "lucide-react";
 import { generateRoutineAction } from "@/actions/ai";
-import { RoutineSuggestionCard } from "./RoutineSuggestionCard";
-import type { RoutineBlock } from "@/types/database";
 import { cn } from "@/lib/utils";
+import type { RoutineBlock } from "@/types/database";
+import { Plus, Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { RoutineSuggestionCard } from "./RoutineSuggestionCard";
 
 type Message = {
   id: string;

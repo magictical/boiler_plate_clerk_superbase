@@ -12,9 +12,6 @@ export default function WorkoutStartClient({ routine }: { routine: RoutineResult
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // 기본 메트릭 구성
-  const totalExercises = routine.structure_json.filter(b => b.type === "exercise").length;
-  // 루프 안쪽은 대략적으로 무시하거나 상세 파싱이 필요하지만, MVP 수준에서는 total_sets로 개수 제공
   // db에 저장된 estimated_time과 total_sets 사용
 
   return (

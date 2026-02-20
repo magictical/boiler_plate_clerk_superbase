@@ -6,7 +6,7 @@ import { RoutineEditorProvider, useRoutineEditor } from "@/components/routine-bu
 import type { RoutineBlock } from "@/types/routine";
 import { ArrowLeft, Layers, Save, Upload } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 function EditorContent() {
@@ -123,7 +123,15 @@ function EditorContent() {
 export default function RoutineEditorPage() {
   return (
     <RoutineEditorProvider>
-      <EditorContent />
+      <Suspense
+        fallback={
+          <div className="flex h-screen items-center justify-center bg-[#0d1414] text-white">
+            로딩 중...
+          </div>
+        }
+      >
+        <EditorContent />
+      </Suspense>
     </RoutineEditorProvider>
   );
 }

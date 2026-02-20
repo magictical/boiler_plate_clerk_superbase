@@ -4,7 +4,7 @@ import { RoutineBlock, RoutineStats } from "@/types/routine";
  * 루틴 블록 리스트의 통계를 재귀적으로 계산합니다.
  */
 export function calculateRoutineStats(blocks: RoutineBlock[]): RoutineStats {
-  let stats: RoutineStats = {
+  const stats: RoutineStats = {
     totalDuration: 0,
     totalSets: 0,
     tut: 0,

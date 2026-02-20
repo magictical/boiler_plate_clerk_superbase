@@ -30,7 +30,7 @@ export function EditorFooter({ routineName }: EditorFooterProps) {
     }
 
     setIsSaving(true);
-    const { data, error } = await createRoutine({
+    const { error } = await createRoutine({
       title: routineName || "나의 루틴",
       estimated_time: stats.totalDuration,
       total_sets: stats.totalSets,

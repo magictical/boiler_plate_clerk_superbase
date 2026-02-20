@@ -15,7 +15,7 @@ export type WorkoutSegment = {
  * - 첫 운동 전에 기본적으로 5초 "Ready" 세션을 맨 앞에 삽입합니다.
  */
 export function flattenRoutine(blocks: RoutineBlock[]): WorkoutSegment[] {
-  let segments: WorkoutSegment[] = [];
+  const segments: WorkoutSegment[] = [];
 
   // 첫 준비 시간: 5초 카운트다운
   segments.push({

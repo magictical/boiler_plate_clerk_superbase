@@ -51,7 +51,7 @@ export function SessionEndClient({ routine }: SessionEndClientProps) {
     let setResults = {};
     try {
       setResults = JSON.parse(resultsParam);
-    } catch (e) {
+    } catch {
       // ignore JSON parse error
     }
 

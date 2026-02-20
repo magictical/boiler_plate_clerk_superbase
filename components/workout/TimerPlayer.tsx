@@ -60,7 +60,6 @@ export function TimerPlayer({ segments, routineId }: TimerPlayerProps) {
 
   // 다음 세그먼트 찾기
   const nextSegments = segments.slice(currentSegmentIndex + 1);
-  const nextExercise = nextSegments.find(s => s.type === "exercise");
 
   const handleAbort = () => {
     // /workout/[routineId]/end 로 이동 (status=aborted)

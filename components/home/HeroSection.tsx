@@ -9,6 +9,7 @@
 import { TierBadge } from "@/components/common/TierBadge";
 import type { TierLevel } from "@/lib/utils/tier";
 import { Settings, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 export type HeroSectionProps = {
@@ -27,10 +28,12 @@ export function HeroSection({
       <div className="flex items-center gap-3">
         <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-[#1fe7f9] to-cyan-800 p-[1.5px] shadow-[0_0_12px_rgba(31,231,249,0.3)]">
           {imageUrl ? (
-            <img
+            <Image
               alt="프로필"
               className="h-full w-full rounded-full object-cover border-2 border-[#0f2123]"
               src={imageUrl}
+              width={36}
+              height={36}
             />
           ) : (
             <div className="h-full w-full rounded-full bg-[#162a2d] border-2 border-[#0f2123] flex items-center justify-center">

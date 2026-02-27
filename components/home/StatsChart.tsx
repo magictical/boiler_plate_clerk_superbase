@@ -2,63 +2,177 @@
 
 /**
  * @file components/home/StatsChart.tsx
- * @description Regular User 홈 성과 차트. 기간 필터(1M/3M/All), Recharts 라인·에어리어.
- * @see docs/design-refs/07_home_user.html, docs/TODO.md 3.2 HM-02
+ * @description Regular User 홈 성과 차트. 루틴 선택 + 기간 필터(1M/3M/All), Recharts 라인·에어리어.
  */
 
-import { getTrainingStats } from "@/actions/training-logs";
+import { setFavoriteRoutine } from "@/actions/routines";
 import type {
-  StatsPeriod,
-  TrainingStatsPoint,
+    TrainingStatsPoint
 } from "@/actions/training-logs";
-import { TrendingUp } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { getTrainingStats } from "@/actions/training-logs";
+import { ChevronDown, Star, TrendingUp } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+    Area,
+    AreaChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
 } from "recharts";
+import { toast } from "sonner";
 
-const PERIOD_LABELS: Record<StatsPeriod, string> = {
-  "1M": "최근 1개월",
-  "3M": "최근 3개월",
-  all: "전체",
+export type RoutineOption = {
+  id: string;
+  title: string;
 };
 
 export type StatsChartProps = {
   initialData?: TrainingStatsPoint[];
-  initialPeriod?: StatsPeriod;
+  /** 최근 수행 루틴 목록 (첫 번째 = 가장 최근 수행) */
+  routines?: RoutineOption[];
+  /** 사용자의 현재 즐겨찾기 루틴 ID */
+  favoriteId?: string | null;
 };
 
 export function StatsChart({
   initialData = [],
-  initialPeriod = "1M",
+  routines = [],
+  favoriteId = null,
 }: StatsChartProps) {
-  const [period, setPeriod] = useState<StatsPeriod>(initialPeriod);
   const [data, setData] = useState<TrainingStatsPoint[]>(initialData);
   const [loading, setLoading] = useState(false);
+  const [selectedRoutineId, setSelectedRoutineId] = useState<string>(
+    favoriteId || routines[0]?.id || ""
+  );
+  const [currentFavoriteId, setCurrentFavoriteId] = useState<string | null>(favoriteId);
+  const [togglingFav, setTogglingFav] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const loadStats = useCallback(async (p: StatsPeriod) => {
+  // 드래그 스크롤을 위한 상태
+  const isDragging = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const loadStats = useCallback(async (routineId: string) => {
     setLoading(true);
-    const { data: next } = await getTrainingStats(p);
+    const { data: next } = await getTrainingStats("all", routineId);
     setData(next);
     setLoading(false);
   }, []);
 
   useEffect(() => {
-    loadStats(period);
-  }, [period, loadStats]);
+    loadStats(selectedRoutineId);
+  }, [selectedRoutineId, loadStats]);
 
-  const chartData = data.map((d) => ({
-    ...d,
-    dateShort: d.date.slice(5).replace(/-/g, "/"),
-  }));
+  // 외부에서 favoriteId가 바뀌었을 때 동기화
+  useEffect(() => {
+    setCurrentFavoriteId(favoriteId);
+  }, [favoriteId]);
+
+  const handleFavoriteToggle = async (e: React.MouseEvent, routineId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (togglingFav) return;
+
+    setTogglingFav(true);
+    const newFavoriteId = currentFavoriteId === routineId ? null : routineId;
+    setCurrentFavoriteId(newFavoriteId);
+
+    setIsDropdownOpen(false);
+    if (newFavoriteId) {
+      setSelectedRoutineId(newFavoriteId);
+    }
+
+    try {
+      const { error } = await setFavoriteRoutine(newFavoriteId);
+      if (error) {
+        setCurrentFavoriteId(currentFavoriteId);
+        toast.error("즐겨찾기 설정에 실패했습니다.");
+      }
+    } catch {
+      setCurrentFavoriteId(currentFavoriteId);
+      toast.error("즐겨찾기 설정 중 오류가 발생했습니다.");
+    } finally {
+      setTogglingFav(false);
+    }
+  };
+
+  // 드롭다운 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const chartData = data.map((d) => {
+    const cleanDate = d.date.replace(/\./g, '-').replace(/\s/g, '').replace(/-+$/, '');
+    const dObj = new Date(cleanDate);
+    const m = dObj.getMonth() + 1;
+    const day = dObj.getDate();
+    return {
+      ...d,
+      dateShort: !isNaN(m) && !isNaN(day) ? `${m}.${day}` : d.date,
+    };
+  });
+
+  // 데이터가 로드될 때 오른쪽 끝으로 자동 스크롤
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      const el = scrollContainerRef.current;
+      setTimeout(() => {
+        el.scrollTo({ left: el.scrollWidth, behavior: "smooth" });
+      }, 50);
+    }
+  }, [chartData.length]);
 
   const hasData = chartData.length > 0;
+  const chartMinWidth = Math.max(100, (chartData.length / 15) * 100);
   const trendLabel = hasData ? "성장 추이" : "데이터 없음";
+
+  // 현재 선택된 루틴의 이름
+  const selectedRoutineName =
+    routines.find((r) => r.id === selectedRoutineId)?.title ?? "루틴 선택";
+
+  // 드래그 이벤트 핸들러
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!scrollContainerRef.current) return;
+    isDragging.current = true;
+    startX.current = e.pageX - scrollContainerRef.current.offsetLeft;
+    scrollLeft.current = scrollContainerRef.current.scrollLeft;
+    scrollContainerRef.current.style.cursor = "grabbing";
+    scrollContainerRef.current.style.scrollBehavior = "auto";
+  };
+
+  const handleMouseLeave = () => {
+    isDragging.current = false;
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = "grab";
+      scrollContainerRef.current.style.scrollBehavior = "smooth";
+    }
+  };
+
+  const handleMouseUp = () => {
+    isDragging.current = false;
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = "grab";
+      scrollContainerRef.current.style.scrollBehavior = "smooth";
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || !scrollContainerRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollContainerRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5;
+    scrollContainerRef.current.scrollLeft = scrollLeft.current - walk;
+  };
 
   return (
     <section className="px-5">
@@ -72,25 +186,71 @@ export function StatsChart({
               {loading ? "로딩 중..." : trendLabel}
             </h3>
           </div>
-          <div className="flex gap-1">
-            {(["1M", "3M", "all"] as const).map((p) => (
-              <button
-                key={p}
-                type="button"
-                onClick={() => setPeriod(p)}
-                disabled={loading}
-                className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide ${
-                  period === p
-                    ? "bg-[#1fe7f9]/20 text-[#1fe7f9]"
-                    : "text-gray-500 hover:text-white"
-                }`}
-              >
-                {PERIOD_LABELS[p]}
-              </button>
-            ))}
-          </div>
         </div>
-        <div className="relative w-full h-64 rounded-xl border border-white/5 bg-[#162a2d]/40 overflow-hidden">
+
+        {/* 루틴 선택 드롭다운 */}
+        {routines.length > 0 && (
+          <div ref={dropdownRef} className="relative px-1">
+            <button
+              type="button"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-1.5 bg-[#162629] border border-white/10 rounded-lg px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white hover:border-[#1fe7f9]/30 transition-all"
+            >
+              <span className="truncate max-w-[180px]">{selectedRoutineName}</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute top-full left-1 mt-1 z-50 bg-[#0d1a1d] border border-white/10 rounded-xl shadow-xl overflow-hidden min-w-[200px] max-w-[280px] max-h-[240px] overflow-y-auto">
+                {routines.map((r) => {
+                  const isFav = currentFavoriteId === r.id;
+                  const isSelected = selectedRoutineId === r.id;
+                  return (
+                    <div
+                      key={r.id}
+                      className={`flex items-center justify-between w-full px-2 py-1.5 transition-colors cursor-pointer ${
+                        isSelected
+                          ? "bg-[#1fe7f9]/10"
+                          : "hover:bg-white/5"
+                      }`}
+                      onClick={() => {
+                        setSelectedRoutineId(r.id);
+                        setIsDropdownOpen(false);
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={(e) => handleFavoriteToggle(e, r.id)}
+                        className={`p-1.5 rounded-md shrink-0 transition-colors ${
+                          isFav
+                            ? "text-amber-400"
+                            : "text-gray-500 hover:text-amber-400/70"
+                        }`}
+                        title={isFav ? "즐겨찾기 해제" : "즐겨찾기 지정"}
+                      >
+                        <Star size={14} className={isFav ? "fill-amber-400" : ""} />
+                      </button>
+                      <span className={`text-xs ml-1.5 flex-1 truncate text-left ${
+                        isSelected ? "text-[#1fe7f9] font-bold" : (isFav ? "text-amber-400/90" : "text-gray-400 hover:text-white")
+                      }`}>
+                        {r.title}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        <div
+          ref={scrollContainerRef}
+          className="relative w-full h-64 rounded-xl border border-white/5 bg-[#162a2d]/40 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden cursor-grab active:cursor-grabbing"
+          style={{ scrollBehavior: "smooth" }}
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+        >
           <div
             className="absolute inset-0 opacity-[0.05]"
             style={{
@@ -100,10 +260,11 @@ export function StatsChart({
             }}
           />
           {hasData ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
+            <div style={{ width: `${chartMinWidth}%`, minWidth: "100%", height: "100%" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
                 data={chartData}
-                margin={{ top: 8, right: 8, left: 8, bottom: 24 }}
+                margin={{ top: 8, right: 36, left: 8, bottom: 36 }}
               >
                 <defs>
                   <linearGradient
@@ -130,17 +291,45 @@ export function StatsChart({
                   tick={{ fill: "#6b7280", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
+                  interval={0}
+                  angle={-45}
+                  textAnchor="end"
+                  dx={-5}
+                  dy={5}
                 />
                 <YAxis hide domain={["auto", "auto"]} />
                 <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#162a2d",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: "8px",
+                  offset={0}
+                  cursor={{ stroke: 'rgba(255,255,255,0.4)', strokeWidth: 1 }}
+                  content={({ active, payload, label, coordinate }) => {
+                    if (active && payload && payload.length) {
+                      // 스크롤 뷰포트 기준 반전
+                      const sc = scrollContainerRef.current;
+                      const visibleX = coordinate ? coordinate.x - (sc?.scrollLeft ?? 0) : 0;
+                      const viewportW = sc?.clientWidth ?? 300;
+                      const isNearRight = visibleX > viewportW * 0.55;
+
+                      return (
+                        <div
+                          style={{
+                            backgroundColor: "#162a2d",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            borderRadius: "8px",
+                            padding: "8px 12px",
+                            maxWidth: "140px",
+                            fontSize: "12px",
+                            transform: isNearRight ? "translateX(calc(-100% - 12px))" : "translateX(12px)",
+                          }}
+                        >
+                          <div style={{ color: "#9ca3af", marginBottom: "6px", fontSize: "11px" }}>{`날짜: ${label}`}</div>
+                          <div style={{ color: "#1fe7f9", fontWeight: "bold" }}>
+                            {`부하: ${Math.round(payload[0].value as number)}`}
+                          </div>
+                        </div>
+                      );
+                    }
+                    return null;
                   }}
-                  labelStyle={{ color: "#9ca3af" }}
-                  formatter={(value: number) => [value, "부하"]}
-                  labelFormatter={(label) => `날짜: ${label}`}
                 />
                 <Area
                   type="monotone"
@@ -151,6 +340,7 @@ export function StatsChart({
                 />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-500">
               <TrendingUp className="w-10 h-10 mb-2 opacity-50" />

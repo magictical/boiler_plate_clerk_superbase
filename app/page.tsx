@@ -5,7 +5,8 @@
  */
 
 import { getProfileForHome } from "@/actions/profiles";
-import { getHomeMetrics, getTrainingStats } from "@/actions/training-logs";
+import { getFavoriteRoutineId } from "@/actions/routines";
+import { getHomeMetrics, getRecentlyUsedRoutines, getTrainingStats } from "@/actions/training-logs";
 import { GuestBanner } from "@/components/home/GuestBanner";
 import { GuestChartSection } from "@/components/home/GuestChartSection";
 import { GuestRoutineButton } from "@/components/home/GuestRoutineButton";
@@ -13,7 +14,6 @@ import { GuestTierSection } from "@/components/home/GuestTierSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { HomeRoutineActions } from "@/components/home/HomeRoutineActions";
 import { MetricGrid } from "@/components/home/MetricGrid";
-import { RoutineFAB } from "@/components/home/RoutineFAB";
 import { StatsChart } from "@/components/home/StatsChart";
 import { StreakWidget } from "@/components/home/StreakWidget";
 import type { TierLevel } from "@/lib/utils/tier";
@@ -54,7 +54,11 @@ export default async function Home() {
   }
 
   const { data: metrics, error: metricsError } = await getHomeMetrics();
-  const { data: initialChartData } = await getTrainingStats("1M");
+  const { data: recentRoutines } = await getRecentlyUsedRoutines();
+  const { data: favoriteId } = await getFavoriteRoutineId();
+  // 가장 최근 수행 루틴의 데이터를 기본값으로 로드하되, 즐겨찾기가 있다면 즐겨찾기 루틴을 우선
+  const defaultRoutineId = favoriteId || recentRoutines?.[0]?.id;
+  const { data: initialChartData } = await getTrainingStats("all", defaultRoutineId);
 
   if (metricsError || !metrics) {
     return (
@@ -85,10 +89,9 @@ export default async function Home() {
             bestStreak={undefined}
           />
           <HomeRoutineActions />
-          <StatsChart initialData={initialChartData || []} initialPeriod="1M" />
+          <StatsChart initialData={initialChartData || []} routines={recentRoutines || []} favoriteId={favoriteId} />
           <MetricGrid metrics={metrics} />
         </div>
-        <RoutineFAB />
       </div>
     </main>
   );

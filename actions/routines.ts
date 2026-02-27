@@ -11,6 +11,8 @@ export type RoutineResult = {
   estimated_time: number;
   total_sets: number;
   structure_json: RoutineBlock[];
+  energy_system: string | null;
+  equipment_type: string | null;
   created_at: string;
   updated_at: string | null;
 };
@@ -82,6 +84,8 @@ export type CreateRoutinePayload = {
   estimated_time: number;
   total_sets: number;
   structure_json: RoutineBlock[];
+  energy_system?: string | null;
+  equipment_type?: string | null;
 };
 
 /**
@@ -101,6 +105,8 @@ export async function createRoutine(payload: CreateRoutinePayload): Promise<{ da
         estimated_time: payload.estimated_time,
         total_sets: payload.total_sets,
         structure_json: payload.structure_json,
+        energy_system: payload.energy_system ?? null,
+        equipment_type: payload.equipment_type ?? null,
       })
       .select()
       .single();
@@ -194,6 +200,8 @@ export async function duplicateRoutine(routineId: string): Promise<{ data: Routi
         estimated_time: original.estimated_time,
         total_sets: original.total_sets,
         structure_json: original.structure_json,
+        energy_system: original.energy_system,
+        equipment_type: original.equipment_type,
       })
       .select()
       .single();
@@ -202,5 +210,51 @@ export async function duplicateRoutine(routineId: string): Promise<{ data: Routi
     return { data: duplicated as RoutineResult, error: null };
   } catch (e) {
     return { data: null, error: e instanceof Error ? e.message : "Failed to duplicate routine" };
+  }
+}
+
+/**
+ * 즐겨찾기된 루틴 ID 조회
+ */
+export async function getFavoriteRoutineId(): Promise<{ data: string | null; error: string | null }> {
+  try {
+    const userUuid = await getCurrentUserUuid();
+    if (!userUuid) return { data: null, error: LOGIN_REQUIRED_MESSAGE };
+
+    const supabase = getServiceRoleClient();
+    const { data, error } = await supabase
+      .from("users")
+      .select("favorite_routine_id")
+      .eq("id", userUuid)
+      .single();
+
+    if (error) throw error;
+    return { data: data?.favorite_routine_id ?? null, error: null };
+  } catch (e) {
+    return { data: null, error: e instanceof Error ? e.message : "Failed to get favorite" };
+  }
+}
+
+/**
+ * 즐겨찾기 설정/해제 (토글). 이미 즐겨찾기된 루틴을 다시 누르면 해제됨.
+ * 다른 루틴을 누르면 기존 즐겨찾기가 자동 해제되고 새 루틴이 설정됨.
+ */
+export async function setFavoriteRoutine(
+  routineId: string | null
+): Promise<{ error: string | null }> {
+  try {
+    const userUuid = await getCurrentUserUuid();
+    if (!userUuid) return { error: LOGIN_REQUIRED_MESSAGE };
+
+    const supabase = getServiceRoleClient();
+    const { error } = await supabase
+      .from("users")
+      .update({ favorite_routine_id: routineId })
+      .eq("id", userUuid);
+
+    if (error) throw error;
+    return { error: null };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Failed to set favorite" };
   }
 }

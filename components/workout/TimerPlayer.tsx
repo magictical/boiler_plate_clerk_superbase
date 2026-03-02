@@ -35,11 +35,21 @@ export function TimerPlayer({ segments, routineId }: TimerPlayerProps) {
   useEffect(() => {
     if (isFinished) {
       toast.success("훈련을 모두 완료하셨습니다! 🎉");
+
+      // 타이머 모드: 모든 exercise 세그먼트를 "success"로 기록
+      const completeResults: Record<string, string> = {};
+      segments
+        .filter(s => s.type === "exercise")
+        .forEach(s => {
+          completeResults[s.id] = "success";
+        });
+
+      const resultsJsonStr = JSON.stringify(completeResults);
       router.replace(
-        `/workout/${routineId}/end?status=completed&start=${encodeURIComponent(startedAtRef.current)}`
+        `/workout/${routineId}/end?status=completed&start=${encodeURIComponent(startedAtRef.current)}&results=${encodeURIComponent(resultsJsonStr)}`
       );
     }
-  }, [isFinished, router, routineId]);
+  }, [isFinished, router, routineId, segments]);
 
   if (isFinished) {
     return (

@@ -1,13 +1,26 @@
 import { getRoutine } from "@/actions/routines";
 import { LoggerPlayer } from "@/components/workout/LoggerPlayer";
+import { getServiceRoleClient } from "@/lib/supabase/service-role";
 import { flattenRoutine } from "@/lib/utils/flattenRoutine";
+import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 
 export default async function LoggerWorkoutPage({ params }: { params: Promise<{ routineId: string }> }) {
   const { routineId } = await params;
-  const { data: routine, error } = await getRoutine(routineId);
 
-  if (error || !routine) {
+  // Get routine and user weight
+  const { userId } = await auth();
+  const supabase = getServiceRoleClient();
+
+  const [routineRes, userRes] = await Promise.all([
+    getRoutine(routineId),
+    userId ? supabase.from("users").select("weight_kg").eq("clerk_id", userId).maybeSingle() : Promise.resolve({ data: null })
+  ]);
+
+  const routine = routineRes.data;
+  const userWeight = userRes.data?.weight_kg || 0;
+
+  if (routineRes.error || !routine) {
     notFound();
   }
 
@@ -30,7 +43,7 @@ export default async function LoggerWorkoutPage({ params }: { params: Promise<{ 
   return (
     <main className="min-h-screen bg-[#0d1414] text-white font-sans overflow-hidden">
       <div className="max-w-md w-full mx-auto h-screen relative">
-        <LoggerPlayer segments={segments} routineId={routine.id} />
+        <LoggerPlayer segments={segments} routineId={routine.id} userWeight={userWeight} />
       </div>
     </main>
   );

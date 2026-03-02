@@ -6,38 +6,40 @@
  * @see docs/design-refs/03_gym_create.html, docs/implementation-plans/2.3-on-02-create-gym.md
  */
 
-import React, { useCallback, useEffect, useState } from "react";
-import {
-  DndContext,
-  DragOverlay,
-  type DragEndEvent,
-  type DragStartEvent,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  useDraggable,
-  useDroppable,
-} from "@dnd-kit/core";
-import { Plus, GripVertical, X, Shield, Award, Star, Gem, Trophy, Crown } from "lucide-react";
-import type { TierLevel } from "@/lib/utils/tier";
-import { TIER_LEVELS, TIER_NAMES, TIER_NAMES_KO, TIER_COLORS } from "@/lib/utils/tier";
 import type { GymScaleInput } from "@/actions/gyms";
-import { DEFAULT_GYM_COLORS } from "@/constants/onboarding";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { DEFAULT_GYM_COLORS } from "@/constants/onboarding";
+import type { TierLevel } from "@/lib/utils/tier";
+import { TIER_COLORS, TIER_LEVELS, TIER_NAMES, TIER_NAMES_KO } from "@/lib/utils/tier";
+import {
+    DndContext,
+    DragOverlay,
+    PointerSensor,
+    useDraggable,
+    useDroppable,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+    type DragStartEvent,
+} from "@dnd-kit/core";
+import { Award, Crown, Gem, GripVertical, Plus, Shield, Star, Trophy, X } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 
 const DEFAULT_HEX = "#FF4B4B";
+
+const generateId = () => (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
 
 /** 기본 색상으로 ColorItem 배열 생성 (id 부여) */
 function getInitialColors(): ColorItem[] {
   return DEFAULT_GYM_COLORS.map((c) => ({
-    id: crypto.randomUUID(),
+    id: generateId(),
     color_hex: c.color_hex,
     color_name: c.color_name,
   }));
@@ -243,7 +245,7 @@ export function GymCreator({ onChange }: GymCreatorProps) {
     setColors((prev) => [
       ...prev,
       {
-        id: crypto.randomUUID(),
+        id: generateId(),
         color_hex: hex,
         color_name: hex,
       },

@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import { BottomNav } from "@/components/layout/BottomNav";
 import { SyncUserProvider } from "@/components/providers/sync-user-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -77,7 +78,7 @@ export default function RootLayout({
     >
       <html lang="ko" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#050808] flex justify-center w-full min-h-[100dvh]`}
           suppressHydrationWarning
         >
           <ThemeProvider
@@ -87,8 +88,11 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <SyncUserProvider>
-              {children}
-              <Toaster />
+              <div className="w-full max-w-[430px] bg-[#0f2123] min-h-[100dvh] relative shadow-2xl flex flex-col overflow-x-hidden">
+                {children}
+                <BottomNav />
+                <Toaster />
+              </div>
             </SyncUserProvider>
           </ThemeProvider>
         </body>

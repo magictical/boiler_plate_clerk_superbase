@@ -608,7 +608,32 @@
 
 ---
 
-## 10. Definition of Done (MVP 완료 조건)
+## 10. Routine Analytics & Personal Metrics (New)
+
+> **PRD 참조**: (추가 기획안) 루틴 다회차 수행 분석 및 체중 기반 볼륨 추적
+
+### 10.1 프로필 신체 스펙 측정 및 검증 (Backend/DB)
+- [ ] `users` 및 `profiles` 테이블 스키마에 `height_cm`, `reach_cm` 컬럼 추가
+- [ ] `routines` 테이블에 `energy_system`, `equipment_type` 컬럼 추가
+- [ ] `actions/profiles.ts` 에 체중/신장/리치 업데이트 서버 액션 추가
+
+### 10.2 프론트엔드 프로필 Guard 및 UI
+- [ ] `app/onboarding/physical-metrics` 또는 기존 단계에 신체/체중 입력 폼 추가
+- [ ] 훈련 시작 시 체중(weight_kg) 미입력 유저를 판별하는 `MissingWeightModal` 컴포넌트 추가
+- [ ] `WorkoutStartClient` 및 `RoutineEditor` (저장 시)에서 체중 Guard 발동
+
+### 10.3 루틴 카테고리화 UI
+- [ ] `RoutineEditor` 최상단(루틴 이름 밑)에 에너지 시스템(2x2) 선택 UI 구현
+- [ ] 훈련 기구 유형(7개) 가로 스크롤(Swipeable Chips) 선택 UI 구현
+
+### 10.4 다회차 통계 분석 (Analytics) 차트
+- [ ] `actions/training-logs.ts` 에 `getRoutineAnalytics(routineId)` API 신설
+- [ ] `components/workout/RoutineAnalyticsChart.tsx` (recharts 사용) 개발
+- [ ] `WorkoutStartClient` 에서 [훈련 구성]과 [통계 분석] 탭 전환 구현
+
+---
+
+## 11. Definition of Done (MVP 완료 조건)
 
 > **PRD 참조**: 7. Definition of Done
 

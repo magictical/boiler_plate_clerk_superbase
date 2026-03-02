@@ -187,6 +187,8 @@ export async function getCurrentUserTier(): Promise<{
 /** Assessment 저장 payload (ON-04 수행 능력 측정) */
 export type AssessmentUpdatePayload = {
   weight_kg?: number | null;
+  height_cm?: number | null;
+  reach_cm?: number | null;
   max_hang_1rm?: number | null;
   no_hang_lift_1rm?: number | null;
 };
@@ -206,6 +208,8 @@ export async function updateAssessment(
 
     const payload: Record<string, number | null> = {};
     if (data.weight_kg !== undefined) payload.weight_kg = data.weight_kg ?? null;
+    if (data.height_cm !== undefined) payload.height_cm = data.height_cm ?? null;
+    if (data.reach_cm !== undefined) payload.reach_cm = data.reach_cm ?? null;
     if (data.max_hang_1rm !== undefined) payload.max_hang_1rm = data.max_hang_1rm ?? null;
     if (data.no_hang_lift_1rm !== undefined) payload.no_hang_lift_1rm = data.no_hang_lift_1rm ?? null;
     if (Object.keys(payload).length === 0) {
@@ -213,14 +217,41 @@ export async function updateAssessment(
     }
 
     const supabase = getServiceRoleClient();
+
+    // user.id 먼저 가져오기
+    const { data: userRow } = await supabase
+      .from("users")
+      .select("id")
+      .eq("clerk_id", userId)
+      .maybeSingle();
+
+    if (!userRow?.id) {
+       return { error: "사용자 정보를 찾을 수 없습니다." };
+    }
+
     const { error } = await supabase
       .from("users")
       .update(payload)
-      .eq("clerk_id", userId);
+      .eq("id", userRow.id);
 
     if (error) {
       return { error: error.message };
     }
+
+    // 만약 weight_kg 가 업데이트되었다면히스토리에도 추가
+    if (payload.weight_kg !== undefined && payload.weight_kg !== null) {
+      const { error: historyError } = await supabase
+        .from("user_weight_history")
+        .insert({
+          user_id: userRow.id,
+          weight_kg: payload.weight_kg,
+        });
+
+      if (historyError) {
+         console.error("Failed to insert weight history", historyError);
+      }
+    }
+
     return { error: null };
   } catch (e) {
     const message = e instanceof Error ? e.message : "updateAssessment failed";
@@ -242,12 +273,15 @@ export async function getProfileForSettings() {
     const { data: userRow, error } = await supabase
       .from("users")
       .select(`
+        id,
         name,
         current_tier,
         max_hang_1rm,
         weight_kg,
+        height_cm,
+        reach_cm,
         home_gym_id,
-        gyms ( name )
+        created_at
       `)
       .eq("clerk_id", userId)
       .maybeSingle();
@@ -256,8 +290,36 @@ export async function getProfileForSettings() {
       return { data: null, error: error.message };
     }
 
-    // Clerk의 정보도 가져올 수 있으나, 일단 DB user 정보 위주로 구성
-    return { data: userRow, error: null };
+    // gyms 관계가 양방향(users.home_gym_id→gyms / gyms.created_by→users)으로
+    // 중의적이어서 임베드 select 시 HTTP 300 오류 발생 → 별도 쿼리로 분리
+    let gymData: { name: string } | null = null;
+    if (userRow?.home_gym_id) {
+      const { data: gym } = await supabase
+        .from("gyms")
+        .select("name")
+        .eq("id", userRow.home_gym_id)
+        .maybeSingle();
+      gymData = gym;
+    }
+
+    // user_weight_history에서 가장 최근 기록 날짜 조회
+    // (없으면 null → 클라이언트에서 체중을 입력하지 않았음으로 간주)
+    let lastWeightUpdate: string | null = null;
+    if (userRow?.id) {
+       const { data: weightHistory } = await supabase
+        .from("user_weight_history")
+        .select("recorded_at")
+        .eq("user_id", userRow.id)
+        .order("recorded_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+       if (weightHistory?.recorded_at) {
+          lastWeightUpdate = weightHistory.recorded_at;
+       }
+    }
+
+    return { data: { ...userRow, gyms: gymData, lastWeightUpdate }, error: null };
   } catch (e) {
     const message = e instanceof Error ? e.message : "getProfileForSettings failed";
     return { data: null, error: message };

@@ -6,17 +6,17 @@
  * @see docs/design-refs/03_gym_create.html, docs/implementation-plans/2.3-on-02-create-gym.md
  */
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { ArrowLeft, Loader2, Pencil, Save } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { GymCreator } from "@/components/onboarding/GymCreator";
-import { LoginRequiredModal, LOGIN_REQUIRED_MESSAGE } from "@/components/login-required-modal";
 import { createGymWithScales, type GymScaleInput } from "@/actions/gyms";
 import { setHomeGym } from "@/actions/profiles";
+import { LOGIN_REQUIRED_MESSAGE, LoginRequiredModal } from "@/components/login-required-modal";
+import { GymCreator } from "@/components/onboarding/GymCreator";
+import { Button } from "@/components/ui/button";
 
 export default function GymCreatePage() {
   const router = useRouter();
@@ -129,7 +129,7 @@ export default function GymCreatePage() {
         )}
 
         {/* Fixed bottom: 저장하기 */}
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent z-20">
+        <div className="fixed bottom-0 w-full max-w-[430px] left-1/2 -translate-x-1/2 p-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent z-20">
           <Button
             type="submit"
             disabled={!canSubmit}

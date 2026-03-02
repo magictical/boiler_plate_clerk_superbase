@@ -6,20 +6,20 @@
  * @see docs/implementation-plans/2.4-on-03-tier-assign.md, PRD 3.1 [Step 2]
  */
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { ColorGrid } from "@/components/onboarding/ColorGrid";
-import { TierBadge } from "@/components/common/TierBadge";
-import { LoginRequiredModal, LOGIN_REQUIRED_MESSAGE } from "@/components/login-required-modal";
-import { getCurrentUserHomeGym, setCurrentTier } from "@/actions/profiles";
 import { getScalesByGymId } from "@/actions/gyms";
-import type { GymGradeScale } from "@/types/database";
+import { getCurrentUserHomeGym, setCurrentTier } from "@/actions/profiles";
+import { TierBadge } from "@/components/common/TierBadge";
+import { LOGIN_REQUIRED_MESSAGE, LoginRequiredModal } from "@/components/login-required-modal";
+import { ColorGrid } from "@/components/onboarding/ColorGrid";
+import { Button } from "@/components/ui/button";
 import type { TierLevel } from "@/lib/utils/tier";
+import type { GymGradeScale } from "@/types/database";
 
 export default function TierAssignPage() {
   const router = useRouter();
@@ -161,7 +161,7 @@ export default function TierAssignPage() {
       </div>
 
       {/* Fixed bottom: 다음 */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent z-20">
+      <div className="fixed bottom-0 w-full max-w-[430px] left-1/2 -translate-x-1/2 p-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent z-20">
         <Button
           onClick={handleNext}
           disabled={!canGoNext}

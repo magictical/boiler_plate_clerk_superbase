@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Training Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#06f9f9",
+              "background-light": "#f5f8f8",
+              "background-dark": "#0f2323",
+              "card-dark": "#162f2f",
+              "card-border": "#214343",
+            },
+            fontFamily: {
+              "display": ["Space Grotesk", "sans-serif"]
+            },
+            borderRadius: {
+              "DEFAULT": "0.25rem",
+              "lg": "0.5rem",
+              "xl": "0.75rem",
+              "2xl": "1rem",
+              "full": "9999px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom grid background pattern */
+        .grid-bg {
+            background-image: linear-gradient(to right, #214343 1px, transparent 1px),
+                              linear-gradient(to bottom, #214343 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+<!-- Main Content Area -->
+<div class="relative flex-1 overflow-y-auto pb-20">
+<!-- Technical Grid Background -->
+<div class="absolute inset-0 grid-bg opacity-20 pointer-events-none z-0"></div>
+<!-- Header -->
+<header class="relative z-10 px-6 pt-12 pb-4 flex items-center justify-between">
+<div>
+<p class="text-primary/70 text-sm font-medium tracking-wider uppercase mb-1">Welcome back, Alex</p>
+<h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Training Lab</h1>
+</div>
+<button class="flex items-center justify-center w-10 h-10 rounded-full bg-card-dark border border-card-border text-primary hover:bg-card-border transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<!-- Stats Overview -->
+<div class="relative z-10 px-6 mb-8">
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+<div class="min-w-[140px] bg-card-dark border border-card-border rounded-xl p-4 flex flex-col gap-1">
+<span class="text-xs text-slate-400 uppercase tracking-wide">Last Session</span>
+<span class="text-xl font-bold text-white">Yesterday</span>
+</div>
+<div class="min-w-[140px] bg-card-dark border border-card-border rounded-xl p-4 flex flex-col gap-1">
+<span class="text-xs text-slate-400 uppercase tracking-wide">Weekly Load</span>
+<span class="text-xl font-bold text-primary">85%</span>
+</div>
+<div class="min-w-[140px] bg-card-dark border border-card-border rounded-xl p-4 flex flex-col gap-1">
+<span class="text-xs text-slate-400 uppercase tracking-wide">Hang Time</span>
+<span class="text-xl font-bold text-white">45m</span>
+</div>
+</div>
+</div>
+<!-- Category Selection -->
+<div class="relative z-10 px-6">
+<h2 class="text-xl font-bold mb-4 flex items-center gap-2">
+<span class="w-1 h-6 bg-primary rounded-full"></span>
+                Select Protocol
+            </h2>
+<div class="grid grid-cols-2 gap-4">
+<!-- Max Strength -->
+<button class="group relative flex flex-col items-start justify-between h-48 p-5 rounded-2xl bg-card-dark border border-card-border hover:border-primary/50 transition-all duration-300 overflow-hidden text-left">
+<div class="absolute right-0 top-0 w-24 h-24 bg-primary/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10 w-12 h-12 flex items-center justify-center rounded-lg bg-background-dark border border-primary/30 text-primary mb-4 shadow-[0_0_15px_rgba(6,249,249,0.3)]">
+<span class="material-symbols-outlined text-[32px]">fitness_center</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">Max Strength</h3>
+<p class="text-xs text-slate-400">Raw force &amp; heavy hangs</p>
+</div>
+</button>
+<!-- Power -->
+<button class="group relative flex flex-col items-start justify-between h-48 p-5 rounded-2xl bg-card-dark border border-card-border hover:border-orange-500/50 transition-all duration-300 overflow-hidden text-left">
+<div class="absolute right-0 top-0 w-24 h-24 bg-orange-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10 w-12 h-12 flex items-center justify-center rounded-lg bg-background-dark border border-orange-500/30 text-orange-500 mb-4 shadow-[0_0_15px_rgba(249,115,22,0.3)]">
+<span class="material-symbols-outlined text-[32px]">flash_on</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-white mb-1 group-hover:text-orange-500 transition-colors">Power</h3>
+<p class="text-xs text-slate-400">Explosive movement</p>
+</div>
+</button>
+<!-- Power Endurance -->
+<button class="group relative flex flex-col items-start justify-between h-48 p-5 rounded-2xl bg-card-dark border border-card-border hover:border-yellow-400/50 transition-all duration-300 overflow-hidden text-left">
+<div class="absolute right-0 top-0 w-24 h-24 bg-yellow-400/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10 w-12 h-12 flex items-center justify-center rounded-lg bg-background-dark border border-yellow-400/30 text-yellow-400 mb-4 shadow-[0_0_15px_rgba(250,204,21,0.3)]">
+<span class="material-symbols-outlined text-[32px]">battery_charging_full</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-white mb-1 group-hover:text-yellow-400 transition-colors">Power Endure</h3>
+<p class="text-xs text-slate-400">Sustained intensity</p>
+</div>
+</button>
+<!-- Endurance -->
+<button class="group relative flex flex-col items-start justify-between h-48 p-5 rounded-2xl bg-card-dark border border-card-border hover:border-green-500/50 transition-all duration-300 overflow-hidden text-left">
+<div class="absolute right-0 top-0 w-24 h-24 bg-green-500/10 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
+<div class="relative z-10 w-12 h-12 flex items-center justify-center rounded-lg bg-background-dark border border-green-500/30 text-green-500 mb-4 shadow-[0_0_15px_rgba(34,197,94,0.3)]">
+<span class="material-symbols-outlined text-[32px]">all_inclusive</span>
+</div>
+<div class="relative z-10">
+<h3 class="text-lg font-bold text-white mb-1 group-hover:text-green-500 transition-colors">Endurance</h3>
+<p class="text-xs text-slate-400">Long-duration effort</p>
+</div>
+</button>
+</div>
+<!-- Recent Activity Mini Section -->
+<div class="mt-8 mb-4">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-xl font-bold flex items-center gap-2">
+                        Recent Logs
+                    </h2>
+<a class="text-primary text-sm font-medium hover:underline" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between bg-card-dark border border-card-border p-4 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm">fitness_center</span>
+</div>
+<div>
+<p class="text-white font-medium">Max Hangs</p>
+<p class="text-xs text-slate-400">Oct 24 • 45 min</p>
+</div>
+</div>
+<span class="text-sm font-bold text-primary">+12%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full z-50 bg-background-dark/80 backdrop-blur-md border-t border-card-border pb-safe">
+<div class="flex justify-between items-center px-6 h-[80px]">
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">dashboard</span>
+<span class="text-[10px] font-medium tracking-wide">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary relative group" href="#">
+<div class="absolute -top-12 bg-primary text-background-dark rounded-full p-3 shadow-[0_0_20px_rgba(6,249,249,0.4)] border-4 border-background-dark transform transition-transform group-hover:-translate-y-1">
+<span class="material-symbols-outlined text-2xl">bolt</span>
+</div>
+<span class="text-[10px] font-medium tracking-wide mt-6">Train</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">analytics</span>
+<span class="text-[10px] font-medium tracking-wide">Stats</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">person</span>
+<span class="text-[10px] font-medium tracking-wide">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

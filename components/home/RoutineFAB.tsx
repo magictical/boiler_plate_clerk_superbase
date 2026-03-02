@@ -15,7 +15,7 @@ export function RoutineFAB() {
 
   return (
     <>
-      <div className="fixed bottom-24 right-5 z-40 max-w-[430px] mx-auto w-full flex justify-end pr-5">
+      <div className="fixed bottom-24 w-full max-w-[430px] left-1/2 -translate-x-1/2 z-40 flex justify-end px-5">
         <button
           onClick={() => setIsMenuOpen(true)}
           className="flex items-center justify-center w-14 h-14 rounded-full bg-[#1fe7f9] text-[#0f2123] shadow-[0_0_20px_rgba(31,231,249,0.4)] hover:shadow-[0_0_30px_rgba(31,231,249,0.6)] hover:scale-105 active:scale-95 transition-all duration-300 group"

@@ -6,17 +6,17 @@
  * @see docs/design-refs/02_gym_select.html
  */
 
-import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
-import { Search, Plus } from "lucide-react";
+import { ArrowLeft, Plus, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-import { GymSearchList } from "@/components/onboarding/GymSearchList";
-import { LoginRequiredModal, LOGIN_REQUIRED_MESSAGE } from "@/components/login-required-modal";
 import { getGyms } from "@/actions/gyms";
 import { setHomeGym } from "@/actions/profiles";
+import { LOGIN_REQUIRED_MESSAGE, LoginRequiredModal } from "@/components/login-required-modal";
+import { GymSearchList } from "@/components/onboarding/GymSearchList";
+import { Button } from "@/components/ui/button";
 import type { Gym } from "@/types/database";
 
 type FilterType = "all" | "official" | "community";
@@ -93,7 +93,14 @@ export default function GymSelectPage() {
     <div className="min-h-screen flex flex-col bg-[#0f2123] text-white">
       {/* Top bar */}
       <div className="shrink-0 flex items-center justify-between p-4 pb-2 pt-12 sticky top-0 z-10 bg-[#0f2123]">
-        <h1 className="text-2xl font-bold leading-tight tracking-tight flex-1">
+        <Link
+          href="/"
+          className="flex items-center justify-center p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors text-white"
+          aria-label="뒤로가기"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Link>
+        <h1 className="text-2xl font-bold leading-tight tracking-tight flex-1 ml-2">
           홈짐 선택
         </h1>
         <Button
@@ -145,7 +152,7 @@ export default function GymSelectPage() {
       />
 
       {/* Bottom: Next (if selected) + Create New Gym */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-8 pt-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent">
+      <div className="fixed bottom-0 w-full max-w-[430px] left-1/2 -translate-x-1/2 z-20 px-4 pb-8 pt-4 bg-linear-to-t from-[#0f2123] via-[#0f2123]/95 to-transparent">
         <div className="flex flex-col gap-3">
           {selectedId && (
             <Button

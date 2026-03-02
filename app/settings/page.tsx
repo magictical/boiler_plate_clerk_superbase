@@ -1,15 +1,35 @@
 import { getProfileForSettings } from "@/actions/profiles";
 import { TierBadge } from "@/components/common/TierBadge";
-import { SignOutButton, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignOutButton, UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
-import { ChevronRight, LogOut, Moon, Settings, Trash2, Volume2 } from "lucide-react";
+import { ChevronRight, LogOut, Moon, Settings, Trash2, User, Volume2 } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 
 export default async function SettingsPage() {
   const clerkUser = await currentUser();
+
   if (!clerkUser) {
-    redirect("/sign-in");
+    return (
+      <main className="min-h-screen bg-[#0d1414] text-white font-sans overflow-hidden pb-20 max-w-md mx-auto relative flex flex-col pt-12">
+        <header className="px-6 py-5 sticky top-0 z-10 bg-[#0d1414]/90 backdrop-blur-md border-b border-white/5">
+          <h1 className="text-2xl font-bold tracking-tight">설정</h1>
+        </header>
+        <div className="px-6 py-6 space-y-8 flex-1 flex flex-col justify-center pb-24">
+          <section className="bg-[#162629] rounded-3xl p-8 border border-white/5 shadow-xl relative overflow-hidden flex flex-col items-center gap-4 text-center">
+            <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center border border-white/5 mb-2">
+              <User className="text-white w-8 h-8 opacity-50" />
+            </div>
+            <h2 className="text-xl font-bold text-white">로그인이 필요합니다</h2>
+            <p className="text-sm text-gray-400 mb-4 px-2">프로필 생성, 루틴 데이터 클라우드 저장 등 GripLab의 모든 기능을 이용하려면 로그인해 주세요.</p>
+            <SignInButton mode="modal">
+              <button className="w-full bg-[#1fe7f9] text-[#0d1414] hover:bg-[#1fe7f9]/80 font-bold py-4 rounded-xl transition-colors shadow-[0_0_20px_rgba(31,231,249,0.3)]">
+                로그인 / 회원가입
+              </button>
+            </SignInButton>
+          </section>
+        </div>
+      </main>
+    );
   }
 
   const { data: profile, error } = await getProfileForSettings();

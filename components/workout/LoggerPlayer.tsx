@@ -10,11 +10,12 @@ import { toast } from "sonner";
 interface LoggerPlayerProps {
   segments: WorkoutSegment[];
   routineId: string;
+  userWeight: number;
 }
 
 export type LoggerStatus = "success" | "half" | "fail" | null;
 
-export function LoggerPlayer({ segments, routineId }: LoggerPlayerProps) {
+export function LoggerPlayer({ segments, routineId, userWeight }: LoggerPlayerProps) {
   const router = useRouter();
 
   // 로거 모드에서는 운동(exercise) 세그먼트만 집중적으로 보여줍니다.
@@ -145,11 +146,30 @@ export function LoggerPlayer({ segments, routineId }: LoggerPlayerProps) {
                 )} style={{ color: isCurrent && segment.color ? segment.color : undefined }}>
                   {segment.title}
                 </h3>
-                {segment.reps && (
-                  <p className="text-sm text-gray-400 font-medium">
-                    목표: {segment.reps}회
-                  </p>
-                )}
+                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                  {segment.reps && (
+                    <span className="text-sm text-gray-400 font-medium bg-black/20 px-2 py-0.5 rounded-md border border-white/5">
+                      {segment.reps}회
+                    </span>
+                  )}
+                  {segment.edgeSize && (
+                    <span className="text-sm text-gray-400 font-medium bg-black/20 px-2 py-0.5 rounded-md border border-white/5">
+                      {segment.edgeSize}mm
+                    </span>
+                  )}
+                  {segment.weight !== undefined && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-[#06e0ce] bg-[#06e0ce]/10 px-2 py-0.5 rounded-md border border-[#06e0ce]/20">
+                        {segment.weight > 0 ? `+${segment.weight}` : segment.weight}kg
+                      </span>
+                      {userWeight > 0 && (
+                        <span className="text-xs font-bold text-[#06e0ce]/80 px-1.5 py-0.5 rounded-md border border-[#06e0ce]/30 bg-black/20">
+                          {Math.round(((userWeight + segment.weight) / userWeight) * 100)}% BW
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="shrink-0 flex items-center justify-center">
@@ -165,7 +185,7 @@ export function LoggerPlayer({ segments, routineId }: LoggerPlayerProps) {
       </main>
 
       {/* 상태 버튼 고정 패널 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-4 bg-gradient-to-t from-[#0d1414] via-[#0d1414]/90 to-transparent pb-8">
+      <div className="fixed bottom-0 w-full max-w-[430px] left-1/2 -translate-x-1/2 p-4 bg-gradient-to-t from-[#0d1414] via-[#0d1414]/90 to-transparent pb-8">
         <div className="bg-[#162629] border border-white/10 p-2 rounded-3xl flex items-center gap-2 shadow-2xl backdrop-blur-md">
           <button
             onClick={() => handleLog("success")}

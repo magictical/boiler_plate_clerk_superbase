@@ -150,3 +150,27 @@
     animation: tier-badge-in 0.35s ease-out;
   }
 }
+
+/* 스크롤바 숨김 (기존 no-scrollbar) */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 테마 스크롤바 (GripLab primary color, 가로/세로) */
+.themed-scrollbar::-webkit-scrollbar {
+  height: 3px;
+  width: 3px;
+}
+.themed-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.themed-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(6, 224, 206, 0.35);
+  border-radius: 9999px;
+}
+.themed-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 224, 206, 0.65);
+}
+.themed-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(6, 224, 206, 0.35) transparent;
+}

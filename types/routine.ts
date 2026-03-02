@@ -9,10 +9,14 @@ export interface BaseBlock {
 
 export interface ExerciseBlock extends BaseBlock {
   type: "exercise";
+  exerciseId?: string; // 추가
   title: string;
   duration: number; // 초 단위
+  requiredFields?: ("weight" | "reps" | "edgeSize")[]; // 추가
+  allowedEdges?: number[]; // 추가
   reps?: number;
   weight?: number;
+  edgeSize?: number; // 추가 (mm 단위)
 }
 
 export interface RestBlock extends BaseBlock {

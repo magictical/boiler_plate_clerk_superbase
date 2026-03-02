@@ -144,7 +144,7 @@ export function SessionEndClient({ routine }: SessionEndClientProps) {
       </div>
 
       {/* 액션 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-6 bg-gradient-to-t from-[#0d1414] via-[#0d1414]/90 to-transparent">
+      <div className="fixed bottom-0 w-full max-w-[430px] left-1/2 -translate-x-1/2 p-6 bg-gradient-to-t from-[#0d1414] via-[#0d1414]/90 to-transparent">
         <button
           onClick={handleSave}
           disabled={isSaving}
